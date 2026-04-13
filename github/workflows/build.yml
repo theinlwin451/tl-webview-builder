@@ -1,0 +1,44 @@
+name: Build Android APK
+on:
+  repository_dispatch:
+    types: [build_apk]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+
+      - name: Install Dependencies
+        run: |
+          npm install
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: Inject Website URL
+        run: |
+          # User ပို့လိုက်တဲ့ URL ကို capacitor config ထဲ ထည့်မယ်
+          sed -i 's|"url": ".*"|"url": "${{ github.event.client_payload.url }}"|' capacitor.config.json
+
+      - name: Build Web Project
+        run: npm run build
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Build Android Release
+        run: |
+          cd android
+          ./gradlew assembleRelease
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebApp-Release-APK
+          path: android/app/build/outputs/apk/release/*.apk

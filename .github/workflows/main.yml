@@ -2,8 +2,6 @@ name: Build Android Release
 
 on:
   workflow_dispatch:
-    inputs:
-      types: [build_apk]
 
 jobs:
   build:

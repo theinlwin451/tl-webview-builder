@@ -3,15 +3,12 @@ Name: Build Android Release
 on:
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        # ဒီနေရာမှာ folder နာမည်ကို သတ်မှတ်ပေးလိုက်တာဖြစ်တဲ့အတွက်
-        # အောက်က step တိုင်းမှာ cd tl-webview-builder လုပ်နေစရာ မလိုတော့ပါဘူး
-        working-directory: tl-webview-builder
-
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
@@ -28,19 +25,26 @@ jobs:
           distribution: 'zulu'
 
       - name: Install Dependencies
+        # tl-webview-builder folder ထဲဝင်ပြီး install လုပ်ခိုင်းတာပါ
         run: |
+          cd tl-webview-builder
           npm install
           npm install @capacitor/core @capacitor/cli @capacitor/android
 
       - name: Build Web Project
-        run: npm run build
+        run: |
+          cd tl-webview-builder
+          npm run build
 
       - name: Sync Capacitor
-        run: npx cap sync android
+        run: |
+          cd tl-webview-builder
+          npx cap sync android
 
       - name: Build Android Release
         run: |
-          cd android
+          # လမ်းကြောင်း အပြည့်အစုံကို သွားခိုင်းတာပါ
+          cd tl-webview-builder/android
           chmod +x gradlew
           ./gradlew clean
           ./gradlew assembleRelease

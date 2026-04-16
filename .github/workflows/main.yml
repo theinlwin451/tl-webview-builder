@@ -1,4 +1,4 @@
-name: Build Android Release
+Name: Build Android Release
 
 on:
   workflow_dispatch:
@@ -6,6 +6,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        # ဒီနေရာမှာ folder နာမည်ကို သတ်မှတ်ပေးလိုက်တာဖြစ်တဲ့အတွက်
+        # အောက်က step တိုင်းမှာ cd tl-webview-builder လုပ်နေစရာ မလိုတော့ပါဘူး
+        working-directory: tl-webview-builder
+
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
